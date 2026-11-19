@@ -1,0 +1,129 @@
+[package]
+name         = "shotlist"
+version      = "0.1.0"
+edition      = "2021"
+authors      = ["Karthik Bhat <52274631+2790karthikbhat@users.noreply.github.com>"]
+description  = "Cull, develop, caption and sequence street photos into a print-ready zine"
+license      = "MIT"
+repository   = "https://github.com/2790karthikbhat/ShotList"
+rust-version = "1.88"
+
+# ─────────────────────────────────────────────
+# Feature flags
+# ─────────────────────────────────────────────
+[features]
+default            = ["provider-anthropic", "provider-openai"]
+provider-anthropic = ["reqwest"]               # Claude Vision API
+provider-openai    = ["reqwest"]               # GPT-4o Vision API
+provider-gemini    = ["reqwest"]               # Google Gemini Vision API
+bench              = []                        # Enable criterion benchmarks
+
+# ─────────────────────────────────────────────
+# Tauri 2 — desktop shell + IPC
+# ─────────────────────────────────────────────
+[dependencies]
+tauri              = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-shell  = "2"
+
+# ─────────────────────────────────────────────
+# Image decoding & processing — pure-Rust, no system libs.
+# `rawler` decodes camera RAW files and exposes their embedded
+# preview images; `image` handles JPEG/PNG/TIFF directly.
+# ─────────────────────────────────────────────
+image  = { version = "0.25", features = ["jpeg", "png", "tiff"] }
+rawler = "0.7"
+
+# ─────────────────────────────────────────────
+# Native folder/file dialogs (kept for blocking folder picker)
+# ─────────────────────────────────────────────
+rfd = "0.14"
+
+# ─────────────────────────────────────────────
+# AI providers — async HTTP (optional, behind feature flags)
+# ─────────────────────────────────────────────
+reqwest      = { version = "0.12", features = ["json", "stream"], optional = true }
+futures-util = "0.3"
+async-trait  = "0.1"
+base64       = "0.22"
+
+# ─────────────────────────────────────────────
+# Serialisation
+# ─────────────────────────────────────────────
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# ─────────────────────────────────────────────
+# Database — SQLite via rusqlite (bundled = no system sqlite)
+# ─────────────────────────────────────────────
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# ─────────────────────────────────────────────
+# Local AI — pure-Rust ONNX inference (tract) + UltraFace face detector
+# ─────────────────────────────────────────────
+tract-onnx = "0.21"
+ureq        = "2"          # blocking HTTP for on-demand model download
+dirs        = "5"          # XDG / macOS data-dir for model cache
+
+# ─────────────────────────────────────────────
+# Async runtime — Tauri commands can be async; tokio is Tauri's runtime
+# ─────────────────────────────────────────────
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+# ─────────────────────────────────────────────
+# Parallelism
+# ─────────────────────────────────────────────
+rayon     = "1.10"
+crossbeam = { version = "0.8", features = ["crossbeam-channel"] }
+
+# ─────────────────────────────────────────────
+# Filesystem & path utilities
+# ─────────────────────────────────────────────
+walkdir = "2"
+notify  = "6"          # filesystem watcher for live folder changes
+
+# ─────────────────────────────────────────────
+# Error handling & logging
+# ─────────────────────────────────────────────
+anyhow             = "1"
+tracing            = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# ─────────────────────────────────────────────
+# Utilities
+# ─────────────────────────────────────────────
+uuid   = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+printpdf = { version = "0.9.1", features = ["jpeg"] }
+
+# ─────────────────────────────────────────────
+# Dev dependencies
+# ─────────────────────────────────────────────
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+tempfile  = "3"
+
+[[bench]]
+name    = "thumbnail_bench"
+harness = false
+
+# ─────────────────────────────────────────────
+# Build profiles
+# ─────────────────────────────────────────────
+[profile.dev]
+opt-level = 1          # faster incremental builds without being totally unoptimised
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"  # link-time optimisation without full LTO build times
+codegen-units = 1
+strip         = true    # strip debug symbols → smaller binary
+panic         = "abort"
+
+[profile.release-with-debug]
+inherits = "release"
+strip    = false
+debug    = true         # for profiling builds (Instruments / perf)

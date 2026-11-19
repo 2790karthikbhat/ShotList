@@ -1,0 +1,13 @@
+{
+  "name": "shotlist",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "setup": "bash scripts/bootstrap.sh",
+    "doctor": "bash scripts/bootstrap.sh --check",
+    "dev": "npm --prefix frontend exec -- tauri dev",
+    "build": "npm --prefix frontend exec -- tauri build",
+    "check": "bash scripts/check.sh",
+    "tauri": "npm --prefix frontend exec -- tauri"
+  }
+}

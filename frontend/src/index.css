@@ -1,0 +1,201 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  color-scheme: dark;
+
+  /* Dark photography theme (default) — mirrors tailwind.config.js's tokens.
+     RGB triplets (not hex) so Tailwind's bg-x/50-style opacity modifiers work
+     — those compile to rgb(var(--color-x-rgb) / <alpha-value>). */
+  --color-bg-rgb:      17 17 17;     /* #111111 */
+  --color-panel-rgb:   26 26 26;     /* #1a1a1a */
+  --color-surface-rgb: 35 35 35;     /* #232323 */
+  --color-border-rgb:  46 46 46;     /* #2e2e2e */
+  --color-hi-rgb:      240 240 240;  /* #F0F0F0 */
+  --color-mid-rgb:     144 144 144;  /* #909090 */
+  --color-lo-rgb:       85  85  85;  /* #555555 */
+  --color-accent-rgb:  220 160  50;  /* #DCA032 */
+
+  /* Chrome colors not covered by the tokens above (plain hex — never used
+     with a Tailwind opacity modifier, just referenced directly in CSS). */
+  --color-input-bg:             #1a1a1a;
+  --color-input-border:         #2e2e2e;
+  --color-input-placeholder:    #555555;
+  --color-shimmer-1:            #1c1c1c;
+  --color-shimmer-2:            #282828;
+  --color-scrollbar-track:      #1a1a1a;
+  --color-scrollbar-thumb:      #333333;
+  --color-scrollbar-thumb-hover: #444444;
+  --color-toast-success-bg:     #1a3d26;
+  --color-toast-error-bg:       #3d1a1a;
+  --color-toast-warning-bg:     #3d2e1a;
+  --color-toast-info-bg:        #1a2a3d;
+  --color-filmstrip-placeholder: #1c1c1c;
+  --color-appmark:              #1d1d1d;
+  --color-caption-dim:          #333333;
+  --color-kbd-bg:               #1f1f1f;
+  --color-star-empty:           #2a2a2a;
+  --color-canvas-bg:            #0d0d0d;
+  --color-canvas-luma-stroke:   rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  --color-bg-rgb:      244 244 244;  /* #f4f4f4 */
+  --color-panel-rgb:   255 255 255;  /* #ffffff */
+  --color-surface-rgb: 232 232 232;  /* #e8e8e8 */
+  --color-border-rgb:  213 213 213;  /* #d5d5d5 */
+  --color-hi-rgb:       26  26  26;  /* #1a1a1a */
+  --color-mid-rgb:      92  92  92;  /* #5c5c5c */
+  --color-lo-rgb:      143 143 143;  /* #8f8f8f */
+  --color-accent-rgb:  220 160  50;  /* #DCA032 — same both themes */
+
+  --color-input-bg:             #ffffff;
+  --color-input-border:         #d0d0d0;
+  --color-input-placeholder:    #999999;
+  --color-shimmer-1:            #e8e8e8;
+  --color-shimmer-2:            #f5f5f5;
+  --color-scrollbar-track:      #eeeeee;
+  --color-scrollbar-thumb:      #cccccc;
+  --color-scrollbar-thumb-hover: #bbbbbb;
+  --color-toast-success-bg:     #e3f5e9;
+  --color-toast-error-bg:       #fbe6e6;
+  --color-toast-warning-bg:     #faf0dc;
+  --color-toast-info-bg:        #e6f0fa;
+  --color-filmstrip-placeholder: #e8e8e8;
+  --color-appmark:              #ececec;
+  --color-caption-dim:          #bbbbbb;
+  --color-kbd-bg:               #ececec;
+  --color-star-empty:           #d8d8d8;
+  --color-canvas-bg:            #f0f0f0;
+  --color-canvas-luma-stroke:   rgba(0, 0, 0, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  background-color: rgb(var(--color-bg-rgb));
+  color: rgb(var(--color-hi-rgb));
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+}
+
+/* Allow text selection inside inputs */
+input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Translucent chrome surface — sidebar, toolbar, popovers, modals, toast.
+   High-opacity backing (78%) so legibility comes first and blur reads as
+   texture, not a see-through pane; references the existing theme-aware
+   --color-panel-rgb so it resolves correctly in both [data-theme="light"]
+   and the default dark root without a separate override. */
+.vibrancy-panel {
+  background: rgb(var(--color-panel-rgb) / 0.78);
+  backdrop-filter: blur(28px) saturate(1.4);
+  -webkit-backdrop-filter: blur(28px) saturate(1.4);
+}
+
+/* Shared input style used across modals */
+.input {
+  width: 100%;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 10px;
+  padding: 8px 11px;
+  font-size: 12px;
+  color: rgb(var(--color-hi-rgb));
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.input:focus {
+  border-color: rgb(var(--color-accent-rgb));
+}
+.input::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+/* Bigger, more grabbable thumb for the app's range sliders (develop
+   adjustments, export quality) — the track height itself is set per-slider
+   via Tailwind classes; only the thumb needs a global rule since Tailwind
+   has no ::-webkit-slider-thumb utility.
+   -webkit-appearance (not just the unprefixed `appearance`) is required
+   here — Tauri on macOS renders through WKWebView/Safari's engine, which
+   needs the vendor-prefixed property on this specific pseudo-element or it
+   falls back to the native thumb's hit-testing box while our custom size/
+   position styles are layered on top, breaking drag. */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: rgb(var(--color-accent-rgb));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  margin-top: 0;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  border: none;
+  background: rgb(var(--color-accent-rgb));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+/* Skeleton shimmer for unloaded thumbnails */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--color-shimmer-1) 25%, var(--color-shimmer-2) 50%, var(--color-shimmer-1) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* Stage switch transition */
+@keyframes stageFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stage-fade-in {
+  animation: stageFadeIn 160ms ease-out;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-scrollbar-thumb-hover);
+}

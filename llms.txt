@@ -1,0 +1,17 @@
+# ShotList
+
+> Open-source desktop app (Rust + Tauri 2 + React/TypeScript) for street and documentary photographers: import RAW/JPEG, cull with the keyboard, analyse exposure and focus, develop non-destructively, caption with optional AI, and export a print-ready zine PDF. MIT licensed. No account, server or telemetry.
+
+Install a release on macOS/Linux: `curl -fsSL https://raw.githubusercontent.com/2790karthikbhat/ShotList/main/scripts/install.sh | bash`
+Build from source: `npm run setup` then `npm run dev`. Verify changes: `npm run check`.
+
+## Docs
+
+- [README](https://github.com/2790karthikbhat/ShotList/blob/main/README.md): features, install, AI provider setup, keyboard shortcuts
+- [AGENTS.md](https://github.com/2790karthikbhat/ShotList/blob/main/AGENTS.md): non-interactive setup, commands, code layout, conventions, IPC pattern
+- [Feature status](https://github.com/2790karthikbhat/ShotList/blob/main/docs/plans/README.md): what is shipped and what is in flight
+
+## Optional
+
+- [Product plan](https://github.com/2790karthikbhat/ShotList/blob/main/PLAN.md): original vision and phase plan
+- [Releases](https://github.com/2790karthikbhat/ShotList/releases): prebuilt macOS, Windows and Linux installers (unsigned)

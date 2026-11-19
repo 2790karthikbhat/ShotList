@@ -1,0 +1,10 @@
+#!/bin/bash
+# Enforced quality gate — see docs/plans/release-hardening/00-overview.md.
+# Activated via `git config core.hooksPath .githooks` (already set for this clone).
+set -e
+
+echo "pre-commit: cargo fmt --check"
+cargo fmt --check
+
+echo "pre-commit: cargo clippy --all-targets --all-features -- -D warnings"
+cargo clippy --all-targets --all-features -- -D warnings
